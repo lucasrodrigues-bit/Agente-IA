@@ -43,7 +43,6 @@ O foco do projeto é duplo:
 
   ## 📁 Estrutura do projeto
  
-```
 agente_ia/
 ├── dominio.py        # Mensagem + Conversa  (todos os dunder methods)
 ├── provedores.py     # ProvedorLLM (ABC) + ProvedorGroq + ProvedorFake
