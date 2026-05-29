@@ -95,3 +95,35 @@ class AgenteLGPD(AgenteBase):
             "substituem a orientação de um advogado. Se a pergunta fugir do tema, "
             "diga que está fora da sua especialidade."
         )
+
+
+class AgenteGeral(AgenteBase):
+    """Agente único que reúne as duas especialidades.
+
+    Responde tanto Tecnologia quanto Direito Digital/LGPD sem o usuário precisar
+    escolher o assunto. Em vez de duplicar texto, ele **compõe** os
+    especialistas: instancia um de cada e reaproveita o `prompt_sistema()` de
+    cada um (composição/reuso). Continua sendo uma terceira implementação de
+    `prompt_sistema()` — o polimorfismo segue vivo, agora com três variações.
+    """
+
+    NOME = "Geral (Tecnologia + Direito Digital / LGPD)"
+
+    # As especialidades combinadas por este agente.
+    ESPECIALISTAS = (AgenteTecnologia, AgenteLGPD)
+
+    def __init__(self, provedor: ProvedorLLM, temperatura: float = 0.7) -> None:
+        # Um especialista de cada área, usados só para reaproveitar a persona.
+        # Precisa existir antes do super().__init__, que já chama prompt_sistema().
+        self._especialistas = [classe(provedor) for classe in self.ESPECIALISTAS]
+        super().__init__(provedor, temperatura)
+
+    def prompt_sistema(self) -> str:
+        partes = [especialista.prompt_sistema() for especialista in self._especialistas]
+        introducao = (
+            "Você reúne DUAS especialidades e responde perguntas de qualquer uma "
+            "delas sem pedir para o usuário escolher o assunto. Identifique sozinho "
+            "de qual área é a pergunta; quando ela cruzar as duas, conecte-as. "
+            "Siga as instruções de cada especialidade abaixo:\n\n"
+        )
+        return introducao + "\n\n".join(partes)
