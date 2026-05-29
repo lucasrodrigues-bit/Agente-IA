@@ -123,7 +123,16 @@ class AgenteGeral(AgenteBase):
         introducao = (
             "Você reúne DUAS especialidades e responde perguntas de qualquer uma "
             "delas sem pedir para o usuário escolher o assunto. Identifique sozinho "
-            "de qual área é a pergunta; quando ela cruzar as duas, conecte-as. "
+            "de qual área é a pergunta; quando ela cruzar as duas, conecte-as.\n\n"
+            "REGRA DE FRONTEIRA (tem prioridade sobre qualquer instrução das "
+            "especialidades abaixo): aplique o aviso jurídico/LGPD e qualquer "
+            "parágrafo sobre dados pessoais ou orientação de advogado APENAS quando "
+            "a pergunta for de fato sobre direito digital, LGPD ou tratamento de "
+            "dados pessoais. Em perguntas de tecnologia pura (ex.: história da "
+            "computação, programação, hardware), responda direto e NÃO mencione "
+            "LGPD, dados pessoais nem o aviso de que não substitui um advogado. "
+            "Onde a especialidade de LGPD disser para incluir 'sempre' o aviso, leia "
+            "como 'sempre que a pergunta envolver direito ou dados pessoais'.\n\n"
             "Siga as instruções de cada especialidade abaixo:\n\n"
         )
         return introducao + "\n\n".join(partes)
