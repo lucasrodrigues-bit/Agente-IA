@@ -5,3 +5,7 @@ _bmad
 .github
 docs
 _bmad-output
+__pycache__
+.env
+.venv
+historico.json
