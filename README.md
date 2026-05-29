@@ -7,8 +7,8 @@ ficou responsável por criar **agentes de IA**, e cada integrante desenvolve um
 agente especializado em uma ou mais áreas de conhecimento.
  
 Eu fiquei responsável pelo agente especialista em **Tecnologia** e em **Direito
-Digital / LGPD**. O usuário escolhe o nicho, conversa pelo terminal, e o agente
-responde sempre dentro do contexto daquela especialidade.
+Digital / LGPD**. É um **único agente** que responde aos dois assuntos na mesma
+conversa pelo terminal — sem o usuário precisar escolher o nicho.
 
 ## 🎯 Objetivo
  
@@ -66,25 +66,45 @@ dentro desse fluxo orquestrado.
 
   ## 🧠 Conceitos de POO aplicados
 
-| **Abstração** |
-| **Herança**  |
-| **Polimorfismo** |
-| **Encapsulamento** |
-| **`@property`** com validação |
-| **Herança múltipla + MRO** |
-| **Dunder methods** |
+Cada pilar aparece porque resolve um problema real do código — não de forma
+decorativa. A tabela abaixo mostra **onde** cada conceito está, para facilitar a
+correção:
+
+| Conceito | Onde aparece (arquivo · classe / método) |
+|---|---|
+| **Abstração** | `provedores.py` · `ProvedorLLM(ABC)` e `agentes.py` · `AgenteBase(ABC)`, com `@abstractmethod` |
+| **Herança + `super()`** | `agentes.py` · `AgenteTecnologia`, `AgenteLGPD` e `AgenteGeral` estendem `AgenteBase` |
+| **Polimorfismo** | `prompt_sistema()` com 3 implementações; e `ProvedorGroq` vs `ProvedorFake` |
+| **Composição** | `agentes.py` · `AgenteGeral` reúne os especialistas reaproveitando o `prompt_sistema()` deles |
+| **Encapsulamento** | `provedores.py` · `__api_key` (privado); `agentes.py` · `_historico` e `__temperatura` |
+| **`@property` com validação** | `agentes.py` · `AgenteBase.temperatura` (faixa 0.0–2.0, levanta `ValueError`) |
+| **Herança múltipla + MRO** | `provedores.py` · `ProvedorGroqAuditado(RegistradorMixin, ProvedorGroq)` (auditoria LGPD) |
+| **Dunder methods** | `dominio.py` · `Mensagem` e `Conversa` (`__len__`, `__iter__`, `__str__`, `__repr__`, ...) |
 
   ## 📁 Estrutura do projeto
  
-agente_ia/
-├── dominio.py        # Mensagem + Conversa  (todos os dunder methods)
-├── provedores.py     # ProvedorLLM (ABC) + ProvedorGroq + ProvedorFake
-├── agentes.py        # AgenteBase (ABC) + mixins + AgenteTecnologia + AgenteLGPD
-├── main.py           # CLI: menu de nicho + loop de conversa
-├── test_agente.py    # testes pytest
-├── .env.example      # GROQ_API_KEY=
+.
+├── dominio.py        # Mensagem + Conversa  (dunder methods)
+├── provedores.py     # ProvedorLLM (ABC) + ProvedorGroq + ProvedorFake + ProvedorGroqAuditado (MRO)
+├── agentes.py        # AgenteBase (ABC) + AgenteTecnologia + AgenteLGPD + AgenteGeral
+├── main.py           # CLI: agente único (Tecnologia + LGPD) + loop de conversa
+├── test_agente.py    # testes pytest (rodam offline, sem rede)
 ├── requirements.txt
+├── .gitignore
 └── README.md
+
+## ▶️ Como rodar
+
+```bash
+pip install -r requirements.txt
+# crie um arquivo .env na raiz com a sua chave gratuita do Groq:
+#   GROQ_API_KEY=gsk_sua_chave_aqui
+python main.py
+```
+
+Sem a `GROQ_API_KEY`, o agente roda em **modo offline** (provedor falso,
+determinístico) — útil para a demonstração sem internet e para os testes.
+Rodar os testes: `pytest -q`.
 
 ## 🧰 Desenvolvimento assistido por IA
  
