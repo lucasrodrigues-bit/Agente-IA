@@ -16,7 +16,7 @@ import os
 from dotenv import load_dotenv
 
 from agentes import AgenteBase, AgenteGeral
-from provedores import ErroDeConexao, ProvedorFake, ProvedorGroqAuditado
+from provedores import ErroDoProvedor, ProvedorFake, ProvedorGroqAuditado
 
 
 def escolher_provedor():
@@ -27,7 +27,7 @@ def escolher_provedor():
             provedor = ProvedorGroqAuditado()
             print("Provedor: Groq (online, com trilha de auditoria).\n")
             return provedor
-        except ErroDeConexao as erro:
+        except ErroDoProvedor as erro:
             print(f"Aviso: {erro}")
     print("Provedor: modo offline (ProvedorFake) — sem internet.\n")
     return ProvedorFake()
@@ -110,7 +110,7 @@ def main() -> None:
 
         try:
             resposta = agente.responder(entrada)
-        except ErroDeConexao as erro:
+        except ErroDoProvedor as erro:
             print(f"[erro] {erro}\n")
             continue
         print(f"{agente.nome}> {resposta}\n")

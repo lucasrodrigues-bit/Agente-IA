@@ -22,8 +22,13 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 
 
-class ErroDeConexao(Exception):
-    """Erro amigável quando não dá para falar com o provedor online."""
+class ErroDoProvedor(Exception):
+    """Erro amigável quando não dá para obter a resposta do provedor online.
+
+    Cobre os casos que o usuário pode enfrentar no dia a dia: chave inválida,
+    limite de requisições (429) e falha de conexão. A CLI captura este erro e
+    mostra a mensagem em vez de quebrar com um traceback.
+    """
 
 
 class ProvedorLLM(ABC):
@@ -74,13 +79,13 @@ class ProvedorGroq(ProvedorLLM):
         try:
             from groq import Groq
         except ImportError as erro:  # pragma: no cover - depende do ambiente
-            raise ErroDeConexao(
+            raise ErroDoProvedor(
                 "O pacote 'groq' não está instalado. Rode: pip install groq"
             ) from erro
 
         chave = api_key if api_key is not None else os.environ.get("GROQ_API_KEY")
         if not chave:
-            raise ErroDeConexao(
+            raise ErroDoProvedor(
                 "GROQ_API_KEY não encontrada. Configure o .env ou use o modo offline."
             )
 
@@ -103,10 +108,21 @@ class ProvedorGroq(ProvedorLLM):
                 messages=messages,
                 temperature=temperatura,
             )
+        except groq.AuthenticationError as erro:
+            raise ErroDoProvedor(
+                "Chave da API do Groq inválida ou expirada. Confira a GROQ_API_KEY no .env."
+            ) from erro
+        except groq.RateLimitError as erro:
+            raise ErroDoProvedor(
+                "Limite de requisições do Groq atingido (429). Aguarde um pouco e tente de novo."
+            ) from erro
         except groq.APIConnectionError as erro:
-            raise ErroDeConexao(
+            raise ErroDoProvedor(
                 "Não foi possível conectar ao Groq. Verifique sua internet."
             ) from erro
+        except groq.APIError as erro:
+            # Rede para qualquer outro erro vindo da API (modelo inválido, etc.).
+            raise ErroDoProvedor(f"Erro do Groq: {erro}") from erro
         return resposta.choices[0].message.content
 
 
