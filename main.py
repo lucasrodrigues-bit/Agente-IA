@@ -3,7 +3,7 @@
 Fluxo:
 1. carrega o `.env`;
 2. escolhe o provedor (Groq auditado se houver chave; senão, modo offline);
-3. menu de nicho -> instancia o agente;
+3. instancia o agente geral (responde Tecnologia e Direito Digital/LGPD);
 4. loop de conversa com alguns comandos especiais;
 5. ao sair, imprime um resumo usando os dunders do agente/conversa.
 """
@@ -15,7 +15,7 @@ import os
 
 from dotenv import load_dotenv
 
-from agentes import AgenteBase, AgenteLGPD, AgenteTecnologia
+from agentes import AgenteBase, AgenteGeral
 from provedores import ErroDeConexao, ProvedorFake, ProvedorGroqAuditado
 
 
@@ -31,17 +31,6 @@ def escolher_provedor():
             print(f"Aviso: {erro}")
     print("Provedor: modo offline (ProvedorFake) — sem internet.\n")
     return ProvedorFake()
-
-
-def escolher_agente(provedor) -> AgenteBase:
-    """Menu de nicho."""
-    print("Escolha o especialista:")
-    print("  [1] Tecnologia")
-    print("  [2] Direito Digital / LGPD")
-    opcao = input("> ").strip()
-    if opcao == "2":
-        return AgenteLGPD(provedor)
-    return AgenteTecnologia(provedor)
 
 
 def salvar_historico(agente: AgenteBase, caminho: str = "historico.json") -> None:
@@ -92,7 +81,7 @@ def imprimir_resumo(agente: AgenteBase) -> None:
 
 def main() -> None:
     provedor = escolher_provedor()
-    agente = escolher_agente(provedor)
+    agente = AgenteGeral(provedor)
     print(f"\n{agente}. Digite sua pergunta (ou 'sair' para encerrar).")
     print("Comandos: sair | salvar | mro | auditoria\n")
 
