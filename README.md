@@ -31,6 +31,39 @@ O foco do projeto é duplo:
 - **Claude Code (Anthropic)** — IA usada como apoio no desenvolvimento, sempre
   com revisão e validação humana do que é gerado.
 
+# 🎼 Orquestração com o BMAD Method
+ 
+O coração do processo de desenvolvimento deste projeto é o **BMAD Method**
+(*Breakthrough Method of Agile AI-Driven Development*) — um framework que troca o
+prompting solto por um **fluxo orquestrado**, como uma orquestra em vez de uma
+jam improvisada.
+ 
+Em vez de um único assistente de código, a BMAD simula um **time de
+desenvolvimento** com agentes especializados, e um **orquestrador** que coordena
+todos eles:
+ 
+| Agente da BMAD | Papel no projeto |
+|---|---|
+| 🔍 **Analista** | Clareia o escopo: que agente de IA construir e por quê. |
+| 📋 **Product Manager** | Organiza os requisitos (nichos, conceitos de POO exigidos). |
+| 🏛️ **Arquiteto** | Define a modelagem das classes e os contratos — gera a especificação. |
+| 💻 **Dev** | Implementa cada módulo a partir da especificação. |
+| ✅ **QA** | Revisa o código gerado, roda os testes e aponta correções. |
+ 
+**O que o orquestrador garante:**
+ 
+- **Handoffs claros** — cada etapa entrega um artefato pronto para a próxima
+  (ex.: o arquiteto produz a especificação que o dev implementa).
+- **Memória de contexto** — as decisões tomadas no planejamento continuam
+  valendo na implementação, mantendo a integridade da arquitetura do começo ao
+  fim.
+- **Disciplina antes do código** — nada é codado sem planejamento, o que evita o
+  "vibe coding" e mantém o projeto sob controle.
+A BMAD roda **integrada ao Claude Code**, que executa a parte de implementação
+dentro desse fluxo orquestrado.
+ 
+
+
   ## 🧠 Conceitos de POO aplicados
 
 | **Abstração** |
