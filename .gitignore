@@ -1,0 +1,11 @@
+_bmad
+.env.local
+.agents
+.claude
+.github
+docs
+_bmad-output
+__pycache__
+.env
+.venv
+historico.json
