@@ -8,7 +8,7 @@ o contrato é validado pelo ProvedorFake injetado.
 
 import pytest
 
-from agentes import AgenteBase, AgenteLGPD, AgenteTecnologia
+from agentes import AgenteBase, AgenteGeral, AgenteLGPD, AgenteTecnologia
 from dominio import Conversa, Mensagem
 from provedores import ProvedorFake, ProvedorGroqAuditado, ProvedorLLM, RegistradorMixin
 
@@ -87,10 +87,22 @@ def test_temperatura_validacao():
 
 
 def test_polimorfismo():
-    tec = AgenteTecnologia(ProvedorFake())
-    lgpd = AgenteLGPD(ProvedorFake())
-    assert tec.prompt_sistema() != lgpd.prompt_sistema()
-    assert "LGPD" in lgpd.prompt_sistema()
+    # Três implementações distintas de prompt_sistema() (polimorfismo).
+    tec = AgenteTecnologia(ProvedorFake()).prompt_sistema()
+    lgpd = AgenteLGPD(ProvedorFake()).prompt_sistema()
+    geral = AgenteGeral(ProvedorFake()).prompt_sistema()
+    assert len({tec, lgpd, geral}) == 3
+    assert "LGPD" in lgpd
+
+
+def test_agente_geral_cobre_os_dois_dominios():
+    # O AgenteGeral compõe os especialistas: seu prompt reúne os dois domínios.
+    geral = AgenteGeral(ProvedorFake())
+    prompt = geral.prompt_sistema()
+    assert "tecnologia" in prompt.lower()   # domínio de tecnologia
+    assert "LGPD" in prompt                  # domínio de direito digital
+    # Responde sem exigir escolha de assunto.
+    assert isinstance(geral.responder("o que é um firewall?"), str)
 
 
 def test_mro_agente():
