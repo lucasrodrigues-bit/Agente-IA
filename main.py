@@ -48,29 +48,6 @@ def salvar_historico(agente: AgenteBase, caminho: str = "historico.json") -> Non
     print(f"Histórico salvo em {caminho} ({len(dados)} mensagens).")
 
 
-def mostrar_mro(agente: AgenteBase) -> None:
-    """Demonstra a ordem de resolução de métodos (MRO)."""
-    print("\nMRO do agente:")
-    for classe in type(agente).__mro__:
-        print(f"  - {classe.__name__}")
-    print("MRO do provedor:")
-    for classe in type(agente._provedor).__mro__:
-        print(f"  - {classe.__name__}")
-    print()
-
-
-def mostrar_auditoria(agente: AgenteBase) -> None:
-    """Imprime a trilha de auditoria, se o provedor for auditado."""
-    registros = getattr(agente._provedor, "registros", None)
-    if not registros:
-        print("Sem trilha de auditoria (provedor offline ou nenhuma chamada ainda).\n")
-        return
-    print("\nTrilha de auditoria:")
-    for linha in registros:
-        print(f"  - {linha}")
-    print()
-
-
 def imprimir_resumo(agente: AgenteBase) -> None:
     """Resumo final usando os dunders."""
     print("\n--- Resumo da sessão ---")
@@ -83,7 +60,7 @@ def main() -> None:
     provedor = escolher_provedor()
     agente = AgenteGeral(provedor)
     print(f"\n{agente}. Digite sua pergunta (ou 'sair' para encerrar).")
-    print("Comandos: sair | salvar | mro | auditoria\n")
+    print("Comandos: sair | salvar\n")
 
     while True:
         try:
@@ -100,12 +77,6 @@ def main() -> None:
             break
         if comando == "salvar":
             salvar_historico(agente)
-            continue
-        if comando == "mro":
-            mostrar_mro(agente)
-            continue
-        if comando == "auditoria":
-            mostrar_auditoria(agente)
             continue
 
         try:
